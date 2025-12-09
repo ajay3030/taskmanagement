@@ -1,0 +1,64 @@
+.viewpro-btn3 {
+  background-color: #15999e;
+  border-radius: 8px !important;
+  margin: 0 auto;
+  color: #fff;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding: 8px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.viewpro-btn3:hover {
+  color: #fff;
+  background-color: #50b3b6;
+}
+
+
+.viewpro-btn2 {
+  background-color: #b9bb11;
+  border-radius: 8px !important;
+  margin: 0 auto;
+  color: #fff;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding: 8px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.viewpro-btn2:hover {
+  color: #fff;
+  background-color: #b9bb11;
+}
+
+
+.tree-node {
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.tree-node:hover {
+  background-color: #f1f3f5;
+}
+
+.tree-children {
+  margin-left: 20px;
+  border-left: 1px dashed #ccc;
+  padding-left: 10px;
+}
+
+.tree-expand-icon {
+  margin-right: 6px;
+  font-weight: bold;
+}
+
+.tree-selected {
+  background-color: rgba(21, 153, 158, 0.15);
+  border-radius: 4px;
+}

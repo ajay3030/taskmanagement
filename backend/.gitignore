@@ -1,0 +1,55 @@
+# --------------------------
+# Node / Express Backend
+# --------------------------
+
+# Dependencies
+node_modules/
+
+# Environment / Secrets
+.env
+.env.*.local
+.env.local
+.env.test
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime files
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# OS Garbage
+.DS_Store
+Thumbs.db
+
+# Build / Compiled output
+dist/
+build/
+coverage/
+.next/
+
+# TypeScript (if using)
+*.tsbuildinfo
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
+.tmp/
+
+# Editor junk
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local data dumps
+dump.sql
+data/
