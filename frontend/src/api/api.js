@@ -41,6 +41,13 @@ export const getMasterDetailsById = async (masterId) => {
   return res.data;               // { success, data }
 };
 
+// ---------------------- MODULE SUMMARY ----------------------
+export const getModuleSummary = async (projectId) => {
+  const res = await axios.get(`${API}/module/module-summary`, {
+    params: { projectId }
+  });
+  return res.data;
+};
 
 // POST insert new master-detail
 export const insertMasterDetail = async (payload) => {
@@ -75,4 +82,11 @@ export const getModuleList = async (projectId) => {
     params: { projectId, mode: "list" }
   });
   return Array.isArray(res.data) ? res.data : res.data.data || [];
+};
+
+// ---------------------- DELETE MODULE (optional placeholder) ----------------------
+export const deleteModule = async (moduleId) => {
+  // NOTE: backend must create this endpoint before using it
+  const res = await axios.delete(`${API}/module/delete/${moduleId}`);
+  return res.data;
 };

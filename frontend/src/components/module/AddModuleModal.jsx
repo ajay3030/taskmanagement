@@ -1,117 +1,94 @@
 // src/components/module/AddModuleModal.jsx
-import { useEffect, useState } from "react";
-import { getMasterDetails } from "../../api/api";
+import { useState } from "react";
 import { createModule } from "../../api/api";
 
+// Assuming the intNodeType ID for 'module' is 1, based on previous step
+const HARDCODED_NODE_TYPE_ID = 1;
+
 export default function AddModuleModal({ show, onClose, onSuccess, projectId, parentId }) {
-  const [nodeTypes, setNodeTypes] = useState([]);
-  const [form, setForm] = useState({
-    varModuleName: "",
-    intNodeType: "",
-    intCreatedBy: 1
-  });
+ const [form, setForm] = useState({
+  varModuleName: "",
+  intNodeType: HARDCODED_NODE_TYPE_ID, // Node Type ID fixed and set
+  intCreatedBy: 1
+ });
 
-  // Fetch NodeType master details (masterTypeId = 5)
-  useEffect(() => {
-    if (!show) return;
+ // Removed: useEffect for fetching node types
 
-    const loadNodeTypes = async () => {
-      const res = await getMasterDetails(1, 5); // typeId=1, masterId = NodeType MasterType
-      setNodeTypes(res.data || []);
-    };
+ const handleChange = (e) => {
+  const { name, value } = e.target;
+    // Only handles varModuleName input changes
+  setForm({ ...form, [name]: value });
+ };
 
-    loadNodeTypes();
-  }, [show]);
+ const handleSubmit = async () => {
+  // Validation: check for Module Name
+  if (!form.varModuleName.trim()) return alert("Module name required");
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+  const payload = {
+   intProjectId: Number(projectId),
+   intParentId: parentId ? Number(parentId) : null,
+   // Using the hardcoded Node Type ID
+   intNodeType: HARDCODED_NODE_TYPE_ID, 
+   varModuleName: form.varModuleName,
+   intCreatedBy: 1
   };
 
-  const handleSubmit = async () => {
-    if (!form.varModuleName.trim()) return alert("Module name required");
-    if (!form.intNodeType) return alert("Select Node Type");
+  const res = await createModule(payload);
 
-    const payload = {
-      intProjectId: Number(projectId),
-      intParentId: parentId ? Number(parentId) : null,
-      intNodeType: Number(form.intNodeType),
-      varModuleName: form.varModuleName,
-      intCreatedBy: 1
-    };
+  if (res.success) {
+   alert("Module created successfully!");
+   onSuccess();
+  } else {
+   alert("Failed to create module");
+  }
+ };
 
-    const res = await createModule(payload);
+ if (!show) return null;
 
-    if (res.success) {
-      alert("Module created successfully!");
-      onSuccess();
-    } else {
-      alert("Failed to create module");
-    }
-  };
+ return (
+  <div className="modal fade show d-block" tabIndex="-1" style={{ background: "#00000070" }}>
+   <div className="modal-dialog">
+    <div className="modal-content">
 
-  if (!show) return null;
+     <div className="modal-header">
+      <h5 className="modal-title">
+       {parentId ? "Add Submodule" : "Add Top Module"}
+      </h5>
+      <button className="btn-close" onClick={onClose}></button>
+     </div>
 
-  return (
-    <div className="modal fade show d-block" tabIndex="-1" style={{ background: "#00000070" }}>
-      <div className="modal-dialog">
-        <div className="modal-content">
+     <div className="modal-body">
 
-          <div className="modal-header">
-            <h5 className="modal-title">
-              {parentId ? "Add Submodule" : "Add Top Module"}
-            </h5>
-            <button className="btn-close" onClick={onClose}></button>
-          </div>
-
-          <div className="modal-body">
-
-            {/* Module Name */}
-            <div className="mb-3">
-              <label className="form-label">Module Name</label>
-              <input
-                type="text"
-                className="form-control"
-                name="varModuleName"
-                value={form.varModuleName}
-                onChange={handleChange}
-                placeholder="Enter module name"
-              />
-            </div>
-
-            {/* Node Type Dropdown */}
-            <div className="mb-3">
-              <label className="form-label">Node Type</label>
-              <select
-                className="form-select"
-                name="intNodeType"
-                value={form.intNodeType}
-                onChange={handleChange}
-              >
-                <option value="">-- Select Node Type --</option>
-                {nodeTypes.map((nt) => (
-                  <option key={nt.intId} value={nt.intId}>
-                    {nt.varName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Read-only Info */}
-            <p className="text-muted small">
-              <strong>Project ID:</strong> {projectId} <br />
-              <strong>Parent ID:</strong> {parentId ?? "None (Top Level)"}
-            </p>
-
-          </div>
-
-          <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-            <button className="viewpro-btn3" onClick={handleSubmit}>Save</button>
-          </div>
-
-        </div>
+      {/* Module Name Input */}
+      <div className="mb-3">
+       <label className="form-label">Module Name</label>
+       <input
+        type="text"
+        className="form-control"
+        name="varModuleName"
+        value={form.varModuleName}
+        onChange={handleChange}
+        placeholder="Enter module name"
+       />
       </div>
+
+      {/* Removed: Node Type dropdown/display section entirely */}
+
+      {/* Read-only Info */}
+      <p className="text-muted small">
+       <strong>Project ID:</strong> {projectId} <br />
+       <strong>Parent ID:</strong> {parentId ?? "None (Top Level)"}
+      </p>
+
+     </div>
+
+     <div className="modal-footer">
+      <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+      <button className="viewpro-btn3" onClick={handleSubmit}>Save</button>
+     </div>
+
     </div>
-  );
+   </div>
+  </div>
+ );
 }
