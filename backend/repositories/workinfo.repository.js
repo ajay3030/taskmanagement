@@ -1,5 +1,7 @@
 const db = require('../config/db');
 
+
+
 exports.createWorkInfo = async (params) => {
     const sql = `CALL sp_workinformation_CUD(?,?,?,?,?,?,?,?,?,?,?)`;
 
@@ -85,3 +87,65 @@ exports.callWorkInfoProcedure = async (params) => {
 
     return rows[0][0];
 };
+
+// example for insertOrUpdateWorkInfo
+exports.insertOrUpdateWorkInfo = async (conn, params) => {
+  const sql = `CALL sp_workinformation_CUD(?,?,?,?,?,?,?,?,?,?,?)`;
+
+  const procParams = [
+    params._intKey,
+    params._intId,
+    params._intModuleId,
+    params._intWorkTypeId,
+    params._intDependencyWorkId,
+    params._varShortDescription,
+    params._varLongDescription,
+    params._intCreatedBy,
+    params._intActive,
+    params._intUserId,
+    params._dttCreationDate
+  ];
+
+  const [res] = await conn.query(sql, procParams);
+  return res[0][0];
+};
+
+
+
+exports.insertOrUpdateWorkDetails = async (conn, params) => {
+  const sql = `CALL sp_workinformationdetails_CUD(?,?,?,?,?,?,?,?)`;
+
+  const procParams = [
+    params._intKey,
+    params._intId,
+    params._intWorkId,
+    params._intPlatformId,
+    params._intPriorityId,
+    params._varDetails,
+    params._varReferenceImageId,
+    params._varMOMId
+  ];
+
+  const [res] = await conn.query(sql, procParams);
+  return res[0][0];
+};
+
+
+exports.insertOrUpdateWorkTarget = async (conn, params) => {
+  const sql = `CALL sp_workinformationtargets_CUD(?,?,?,?,?,?,?)`;
+
+  const procParams = [
+    params._intKey,                    // required
+    params._intId,                     // required
+    params._intWorkId,
+    params._dttTargetDate,
+    params._intStatusId,
+    params._Comments,
+    params._intChangeStatusId
+  ];
+
+  const [res] = await conn.query(sql, procParams);
+  return res[0][0];
+};
+
+

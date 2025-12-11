@@ -55,3 +55,15 @@ exports.deleteWorkInfo = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
+
+
+exports.createWorkInfoDetailTarget = async (req, res) => {
+  try {
+    const payload = req.body;
+    const result = await workInfoService.createWorkInfoDetailTarget(payload);
+    res.status(201).json({ success: true, data: result });
+  } catch (err) {
+    // log error properly (see logging note below)
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

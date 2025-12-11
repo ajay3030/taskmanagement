@@ -4,6 +4,7 @@ const masterRoutes = require('./routes/master.route')
 const moduleRoutes = require('./routes/module.route')
 const workInfoRoutes = require('./routes/workinfo.route')
 const workDetailsRoutes = require('./routes/workdetails.route')
+const uploadRoutes = require("./routes/upload.route");
 const pool = require('./config/db')
 const cors = require('cors');
 
@@ -20,6 +21,9 @@ app.use('/api/master',masterRoutes)
 app.use('/api/module',moduleRoutes)
 app.use('/api/workinfo',workInfoRoutes)
 app.use('/api/workdetails',workDetailsRoutes)
+app.use("/api/upload", uploadRoutes);
+app.use("/uploads", express.static("uploads"));
+
 
 // Global error handler
 app.use((err, req, res, next) => {
