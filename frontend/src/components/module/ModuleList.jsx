@@ -10,10 +10,18 @@ import {
 
 import AddModuleModal from "./AddModuleModal";
 import CreateTaskModal from "./CreateTaskModal";
+import DetailModal from "./DetailModal";
 
 export default function ModuleList() {
   const navigate = useNavigate();
 
+  const [showTaskDetails, setShowTaskDetails] = useState(false);
+  const [selectedWorkInfoId, setSelectedWorkInfoId] = useState(null);
+
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [taskModalProps, setTaskModalProps] = useState(null);
+
+  
   // project + master states
   const [masterTypes, setMasterTypes] = useState([]);
   const [projectMasterTypeId, setProjectMasterTypeId] = useState(null);
@@ -160,9 +168,14 @@ export default function ModuleList() {
   };
 
   const openAssignModal = (moduleId) => {
-    setAssignModuleId(moduleId);
-    setShowAssignModal(true);
-  };
+  setTaskModalProps({
+    mode: "create",
+    moduleId,
+    workInfoId: null,
+  });
+  setShowTaskModal(true);
+};
+
 
   // ---------------------------------------------------------
   // Delete Module Handler (backend must support this)
@@ -186,9 +199,25 @@ export default function ModuleList() {
     navigate(`/module-edit/${moduleId}`);
   };
 
-  const handleViewDetails = (moduleId) => {
-    navigate(`/module-tree?projectId=${selectedProjectId}&focusId=${moduleId}`);
-  };
+  // const handleViewDetails = (moduleId) => {
+  //   navigate(`/module-tree?projectId=${selectedProjectId}&focusId=${moduleId}`);
+  // };
+  const handleViewDetails = (workInfoId, moduleId) => {
+  if (!workInfoId) {
+    alert("No task assigned yet.");
+    return;
+  }
+
+  setTaskModalProps({
+    mode: "view",
+    workInfoId,
+    moduleId,
+  });
+
+  setShowTaskModal(true);
+};
+
+
 
    const getStatusBadgeColor = (statusName) => {
     switch (statusName?.toLowerCase()) {
@@ -205,128 +234,6 @@ export default function ModuleList() {
     }
 };
 
-  // ---------------------------------------------------------
-  // Render Table Rows Recursively
-  // ---------------------------------------------------------
-//   const renderRows = (nodes, depth = 0) => {
-//     return nodes.flatMap((node) => {
-//       const row = (
-//         <tr key={node.moduleId}>
-//           {/* Tree column */}
-//           <td style={{ whiteSpace: "nowrap", verticalAlign: "middle" }}>
-//             <div className="d-flex align-items-center">
-//               <div
-//                 style={{
-//                   marginLeft: depth * 18,
-//                   display: "inline-flex",
-//                   gap: 8,
-//                   alignItems: "center",
-//                 }}
-//               >
-//                 {/* expand/collapse */}
-//                 {node.children.length > 0 ? (
-//                   <button
-//                     className="btn btn-sm btn-outline-secondary"
-//                     style={{ width: 34, height: 34, padding: 0 }}
-//                     onClick={() => toggleExpanded(node.moduleId)}
-//                   >
-//                     {isExpanded(node.moduleId) ? "▾" : "▸"}
-//                   </button>
-//                 ) : (
-//                   <div style={{ width: 34 }} />
-//                 )}
-
-//                 <strong>{node.moduleName}</strong>
-
-//                 {/* Add Submodule */}
-//                 <button
-//                   className="btn btn-sm btn-link"
-//                   onClick={() => openAddModule(node.moduleId)}
-//                 >
-//                   <i className="bi bi-plus-circle"></i>
-//                 </button>
-//               </div>
-//             </div>
-//           </td>
-
-//           {/* Created By */}
-//           <td>{node.createdByName || "-"}</td>
-
-//           {/* Assigned To */}
-//           <td>
-//             {node.assignedToName ? (
-//               <span className="badge bg-secondary">{node.assignedToName}</span>
-//             ) : (
-//               <button
-//                 className="btn btn-sm viewpro-btn3"
-//                 onClick={() => openAssignModal(node.moduleId)}
-//               >
-//                 Assign
-//               </button>
-//             )}
-//           </td>
-
-//           {/* Work Type */}
-//           <td>
-//             {node.workTypeName ? (
-//               <span className="badge bg-info text-dark">{node.workTypeName}</span>
-//             ) : (
-//               "-"
-//             )}
-//           </td>
-
-//           {/* Status */}
-//           <td>{node.statusName || node.status || "-"}</td>
-
-//           {/* Actions */}
-//           <td>
-//             <div className="dropdown">
-//               <button
-//                 className="btn btn-sm btn-outline-secondary"
-//                 data-bs-toggle="dropdown"
-//               >
-//                 <i className="bi bi-three-dots-vertical"></i>
-//               </button>
-
-//               <ul className="dropdown-menu">
-//                 <li>
-//                   <button
-//                     className="dropdown-item"
-//                     onClick={() => handleEditModule(node.moduleId)}
-//                   >
-//                     Edit
-//                   </button>
-//                 </li>
-//                 <li>
-//                   <button
-//                     className="dropdown-item"
-//                     onClick={() => handleDeleteModule(node.moduleId)}
-//                   >
-//                     Delete
-//                   </button>
-//                 </li>
-//                 <li>
-//                   <button
-//                     className="dropdown-item"
-//                     onClick={() => handleViewDetails(node.moduleId)}
-//                   >
-//                     View Details
-//                   </button>
-//                 </li>
-//               </ul>
-//             </div>
-//           </td>
-//         </tr>
-//       );
-
-//       const children =
-//         node.children.length > 0 && isExpanded(node.moduleId)
-//           ? renderRows(node.children, depth + 1)
-//           : [];
-
-//       return [row, ...children];
-//     });
-//   };
  const renderRows = (nodes, depth = 0) => {
     return nodes.flatMap((node) => {
       const row = (
@@ -401,42 +308,29 @@ export default function ModuleList() {
 
           {/* Actions */}
           <td style={{ verticalAlign: "middle" }}>
-            <div className="dropdown">
-              <button
-                className="btn btn-sm btn-outline-secondary p-1" // Smaller button
-                data-bs-toggle="dropdown"
-              >
-                <i className="bi bi-gear"></i> {/* Changed to a more meaningful gear icon */}
-              </button>
+  {/* <button
+    className="btn btn-sm btn-outline-primary me-2"
+    onClick={() => handleEditModule(node.moduleId)}
+  >
+    <i className="bi bi-pencil-square me-1"></i> Edit
+  </button>
 
-              <ul className="dropdown-menu">
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => handleEditModule(node.moduleId)}
-                  >
-                    <i className="bi bi-pencil-square me-2"></i> Edit
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item text-danger" // Highlight delete
-                    onClick={() => handleDeleteModule(node.moduleId)}
-                  >
-                    <i className="bi bi-trash me-2"></i> Delete
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => handleViewDetails(node.moduleId)}
-                  >
-                    <i className="bi bi-eye me-2"></i> View Details
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </td>
+  <button
+    className="btn btn-sm btn-outline-danger me-2"
+    onClick={() => handleDeleteModule(node.moduleId)}
+  >
+    <i className="bi bi-trash me-1"></i> Delete
+  </button> */}
+
+  <button
+  className="btn btn-sm btn-outline-info"
+  onClick={() => handleViewDetails(node.workInfoId, node.moduleId)}
+>
+  <i className="bi bi-eye me-1"></i> View
+</button>
+
+</td>
+
         </tr>
       );
 
@@ -541,16 +435,31 @@ export default function ModuleList() {
         parentId={addParentId}
       />
 
-      {showAssignModal && (
-        <CreateTaskModal
-          moduleId={assignModuleId}
-          onClose={() => setShowAssignModal(false)}
-          onSuccess={() => {
-            setShowAssignModal(false);
-            refreshModules();
+      {showTaskModal && taskModalProps && (
+  <CreateTaskModal
+    mode={taskModalProps.mode}
+    moduleId={taskModalProps.moduleId}
+    workInfoId={taskModalProps.workInfoId}
+    onClose={() => setShowTaskModal(false)}
+    onSuccess={() => {
+      setShowTaskModal(false);
+      refreshModules();
+    }}
+  />
+)}
+
+      {showTaskDetails && (
+        <DetailModal
+          workInfoId={selectedWorkInfoId}
+          onClose={() => setShowTaskDetails(false)}
+          onEdit={(prefilledData) => {
+            setShowTaskDetails(false);
+            setAssignModuleId(prefilledData.taskInfo.intModuleId);
+            setShowAssignModal(true);
           }}
         />
-      )}
+)}
+
     </div>
   )
 }

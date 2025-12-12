@@ -90,3 +90,41 @@ export const deleteModule = async (moduleId) => {
   const res = await axios.delete(`${API}/module/delete/${moduleId}`);
   return res.data;
 };
+
+export const getFullTaskDetails = async (workInfoId) => {
+  const res = await axios.get(`${API}/workinfo/${workInfoId}/details`);
+  return res.data;
+};
+
+export const createWorkInfoDetailTarget = async (payload) => {
+  try {
+    const res = await axios.post(
+      `${API}/workinfo/create-work-info-detail-target`,
+      payload
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Error creating work info detail and target:", err);
+    throw err;
+  }
+};
+
+export const uploadMultipleFiles = async (formData) => {
+  try {
+    const res = await axios.post(
+      `${API}/upload/multi`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Upload error:", err);
+    throw err;
+  }
+};
+
+export const updateWorkInfoDetailTarget = async (payload) => {
+  const res = await axios.put(`${API}/workinfo/update-work-info-detail-target`, payload);
+  return res.data;
+};
+

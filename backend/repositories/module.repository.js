@@ -84,7 +84,8 @@ const getModuleSummary = async (projectId) => {
     createdByName: r.createdByName ?? null,
     assignedTo: r.assignedTo === null ? null : r.assignedTo,
     assignedToName: r.assignedToName || null,
-    status: r.status || null,
+    workInfoId: r.workInfoId || null,
+    status: r.statusName || null,
     statusId: r.statusId || null,
     workTypeId: r.workTypeId || null,
     workTypeName: r.workTypeName || null

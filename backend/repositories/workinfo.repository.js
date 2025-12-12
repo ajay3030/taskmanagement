@@ -110,25 +110,23 @@ exports.insertOrUpdateWorkInfo = async (conn, params) => {
   return res[0][0];
 };
 
+// exports.insertOrUpdateWorkDetails = async (conn, params) => {
+//   const sql = `CALL sp_workinformationdetails_CUD(?,?,?,?,?,?,?,?)`;
 
+//   const procParams = [
+//     params._intKey,
+//     params._intId,
+//     params._intWorkId,
+//     params._intPlatformId,
+//     params._intPriorityId,
+//     params._varDetails,
+//     params._varReferenceImageId,
+//     params._varMOMId
+//   ];
 
-exports.insertOrUpdateWorkDetails = async (conn, params) => {
-  const sql = `CALL sp_workinformationdetails_CUD(?,?,?,?,?,?,?,?)`;
-
-  const procParams = [
-    params._intKey,
-    params._intId,
-    params._intWorkId,
-    params._intPlatformId,
-    params._intPriorityId,
-    params._varDetails,
-    params._varReferenceImageId,
-    params._varMOMId
-  ];
-
-  const [res] = await conn.query(sql, procParams);
-  return res[0][0];
-};
+//   const [res] = await conn.query(sql, procParams);
+//   return res[0][0];
+// };
 
 
 exports.insertOrUpdateWorkTarget = async (conn, params) => {
@@ -142,6 +140,96 @@ exports.insertOrUpdateWorkTarget = async (conn, params) => {
     params._intStatusId,
     params._Comments,
     params._intChangeStatusId
+  ];
+
+  const [res] = await conn.query(sql, procParams);
+  return res[0][0];
+};
+
+
+exports.insertOrUpdateWorkDetails = async (conn, params) => {
+  const sql = `CALL sp_workinformationdetails_CUD(?,?,?,?,?,?,?,?)`;
+
+  const procParams = [
+    params._intKey,                  // 1, 2, 3, OR NOW 4 (UPSERT)
+    params._intId,                   // always 0 for upsert
+    params._intWorkId,
+    params._intPlatformId,
+    params._intPriorityId,
+    params._varDetails,
+    params._varReferenceImageId,
+    params._varMOMId
+  ];
+
+  const [res] = await conn.query(sql, procParams);
+  return res[0][0]; // always returns { intId: ... }
+};
+
+
+exports.getFullWorkInfoDetails = async (workId) => {
+  const sql = `CALL sp_workinfo_full_details_R(?);`;
+  const [resultSets] = await db.query(sql, [workId]);
+
+  // resultSets = [taskInfoRows, detailsRows, targetRows, extraMeta]
+
+  const taskInfo = resultSets[0]?.[0] || null;
+  const details = resultSets[1]?.[0] || null;
+  const targets = resultSets[2] || [];
+
+  return { taskInfo, details, targets };
+};
+
+
+exports.updateWorkInfo = async (conn, params) => {
+  const sql = `CALL sp_workinformation_CUD(?,?,?,?,?,?,?,?,?,?,?)`;
+
+  const procParams = [
+    2,                         // _intKey = 2 (update)
+    params.workInfoId,        // _intId
+    params.intModuleId,
+    params.intWorkTypeId,
+    params.intDependencyWorkId,
+    params.varShortDescription,
+    params.varLongDescription,
+    params.intCreatedBy,
+    1,                        // intActive stays 1
+    params.intUserId,
+    new Date()                // dttCreationDate remains unchanged—ignored on update
+  ];
+
+  const [res] = await conn.query(sql, procParams);
+  return res[0][0];
+};
+
+exports.upsertWorkDetails = async (conn, params) => {
+  const sql = `CALL sp_workinformationdetails_CUD(?,?,?,?,?,?,?,?)`;
+
+  const procParams = [
+    params.intDetailsId ? 2 : 1,   // update if ID exists, else insert
+    params.intDetailsId || 0,
+    params.workInfoId,
+    params.intPlatformId,
+    params.intPriorityId,
+    params.varDetails,
+    params.varReferenceImageId,
+    params.varMOMId
+  ];
+
+  const [res] = await conn.query(sql, procParams);
+  return res[0][0];
+};
+
+exports.upsertWorkTarget = async (conn, params) => {
+  const sql = `CALL sp_workinformationtargets_CUD(?,?,?,?,?,?,?)`;
+
+  const procParams = [
+    params.targetId ? 2 : 1,           // update if exists
+    params.targetId || 0,
+    params.workInfoId,
+    params.dttTargetDate,
+    params.intStatusId,
+    params.Comments,
+    params.intChangeStatusId
   ];
 
   const [res] = await conn.query(sql, procParams);

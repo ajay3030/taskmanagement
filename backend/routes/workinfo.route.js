@@ -10,5 +10,8 @@ router.post('/create-work-info', createWorkInfoValidator, validate, workInfoCont
 router.get('/get-work-list', workInfoController.getWorkList);
 router.put('/update-work-info/:id',updateWorkInformationValidator,validate, workInfoController.updateWorkInfo);
 router.delete('/delete-work-info/:id', workInfoController.deleteWorkInfo);
+router.get("/:id/details", workInfoController.getFullDetails);
+router.put("/update-work-info-detail-target",workInfoController.updateWorkInfoDetailTarget);
+router.post("/create-work-info-detail-target",workInfoController.createWorkInfoDetailTarget);
 
 module.exports = router;
